@@ -1,0 +1,269 @@
+---
+title: 
+date: "Maunscript last updated: `r format(Sys.time(), '%d %B, %Y')`"
+bibliography: references.bib
+csl: nature.csl
+output:
+  bookdown::word_document2:
+      toc: false
+      toc_depth: 3
+      reference_docx: word-styles-reference-01.docx
+  bookdown::pdf_document2:
+  bookdown::html_document2:
+      toc: true
+      toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen = 999)
+
+#Load relevant libraries and datasets from the 'outputs' folder
+library(data.table)
+library(here)
+
+
+cohort2description <- read.csv(here("output/","cohort2description.csv"),header=TRUE)
+cohort2table1 <- read.csv(here("output/","cohort2_table1.csv"),header=FALSE)
+cohort2missingdata <- read.csv(here("output/","cohort2missingdata.csv"),header=TRUE)
+cohort2results <- read.csv(here("output/","analysis-cohort2_reg.csv"),header=TRUE)
+
+```
+
+# Cover page
+
+__Title: __  
+Repurposing lipid regulating drugs for the prevention of Alzheimer's disease
+
+
+__Authors and Affiliations:__  
+Luke A McGuinness^1,2^, Venexia M Walker^1,2^, Neil M Davies^1,2^, Richard M Martin^1,2^, and Patrick G Kehoe^3,4^
+
+(1) MRC University of Bristol Integrative Epidemiology Unit, Bristol, UK
+(2) Bristol Medical School: Population Health Sciences, University of Bristol, Bristol, UK
+(3) Dementia Research Group, Bristol Medical School, University of Bristol, Bristol, UK
+(4) Bristol Medical School: Translational Health Sciences, University of Bristol, Bristol, UK
+
+__Corresponding author:__  
+Luke McGuinness; Bristol Medical School, University of Bristol,
+Canynge Hall, 39 Whatley Road, Bristol, BS8 2PS, United Kingdom.; luke.mcguinness@bristol.ac.uk
+
+
+#####
+
+# Abstract {#abstract}
+**Introduction**:
+
+**Methods**:
+
+**Findings**:
+
+**Interpretation**:
+
+**Funding**:
+
+#####
+
+# Research in context {#research-in-context}
+
+**Evidence before this study**:
+
+**Added value of this study**:
+
+**Implications of all the available evidence**: 
+
+
+#####
+
+# Introduction
+
+
+#####
+
+# Methods {#methods}
+## CPRD Analysis
+
+## Mendelian randomization analysis
+
+
+
+#####
+
+# Results {#results}
+## CPRD Analysis
+
+Table of characteristics
+
+&nbsp;
+
+``` {r cohort2table1}
+
+cohort2table1 <- data.table::transpose(cohort2table1)
+colnames(cohort2table1) <- as.character(unlist(cohort2table1[1,]))
+cohort2table1 = cohort2table1[-1, ]
+
+rownames(cohort2table1)[1] <- "N"
+rownames(cohort2table1)[2] <-"Median year of prescription"
+rownames(cohort2table1)[3] <-"Female"
+rownames(cohort2table1)[4] <-"Age"
+rownames(cohort2table1)[5] <-"CAD"
+rownames(cohort2table1)[6] <-"CBS"
+rownames(cohort2table1)[7] <-"CVD"
+rownames(cohort2table1)[8] <-"Charlson"
+rownames(cohort2table1)[9] <-"IMD-2010"
+rownames(cohort2table1)[10] <-"Consulation rate"
+rownames(cohort2table1)[11] <-"Alcohol (ever)"
+rownames(cohort2table1)[12] <-"Smoking (ever)"
+rownames(cohort2table1)[13] <-"BMI"
+rownames(cohort2table1)[14] <-"PAD"
+rownames(cohort2table1)[15] <-"Hypertension"
+rownames(cohort2table1)[16] <-"Stopped"
+rownames(cohort2table1)[17] <-"Added"
+rownames(cohort2table1)[18] <-"Switched"
+rownames(cohort2table1)[19] <-"Other drug within 5yrs"
+cohort2table1 <- cohort2table1[,-1]
+
+cohort2table1 <- cohort2table1[,c(9,6,8,1:5,7)]
+cohort2table1.disp <- cohort2table1[c(1:19),]
+knitr::kable(cohort2table1.disp, booktabs = TRUE, caption = 'Patient characteristics of Cohort 2', row.names = TRUE)
+
+```
+
+```{r, eval = TRUE}
+
+total <- cohort2missingdata[1,1]
+totalpercent <- round(total/as.numeric(cohort2table1[1,1])*100,2)
+totaltext <- paste0(total, " participants (", totalpercent,"%)")
+
+imd <- cohort2missingdata[2,1]
+imdpercent <- round(imd/as.numeric(cohort2table1[1,1])*100,2)
+imdtext <- paste0(imd, " participants (", imdpercent,"%)")
+
+alcohol <- cohort2missingdata[3,1]
+alcoholpercent <- round(alcohol/as.numeric(cohort2table1[1,1])*100,2)
+alcoholtext <- paste0(alcohol, " participants (", alcoholpercent,"%)")
+
+smoking <- cohort2missingdata[4,1]
+smokingpercent <- round(smoking/as.numeric(cohort2table1[1,1])*100,2)
+smokingtext <- paste0(smoking, " participants (", smokingpercent,"%)")
+
+bmi <- cohort2missingdata[5,1]
+bmipercent <- round(bmi/as.numeric(cohort2table1[1,1])*100,2)
+bmitext <- paste0(bmi, " participants (", bmipercent,"%)")
+
+prior.all<- paste0(as.numeric(cohort2table1[20,1]))
+prior.none <- paste0(as.numeric(cohort2table1[20,2]))
+prior.statins <- paste0(as.numeric(cohort2table1[20,3]))
+
+```
+
+The proportions of participants with missing covariate information were comparable to those presented in the anti-hypertensives paper.
+
+* Full covariate information was available for `r totaltext`.
+* IMD 2010 score, a proxy for socioeconomic position that is measured as twentiles with 1 indicating the least deprived and 20 indicating the most deprived, was missing for `r imdtext`.
+*  Alcohol status was missing for `r alcoholtext`. 
+*  Smoking status was missing for `r smokingtext`.
+* BMI, or a calculated BMI from height and weight measurements, was missing for `r bmitext`.
+
+&nbsp;
+
+Table \@ref(tab:cohort2table1) shows the proportion of participants receviving each drug class who subsequently stoppped (greater than 6 months between last prescription and end of data), added (second drug prescribed before last prescription for the index_drug) or switched (second drug prescribed after last prescription for the index_drug).
+
+&nbsp;
+
+Note: the discrepancies between the number of participants in the table of characteristics and that displayed in the forest plot is due to `r prior.all` participants having a diagnosis date prior to the index date (`r prior.none` in the control group and `r prior.statins` in the statin group).
+
+&nbsp;
+
+```{r}
+
+```
+
+
+
+```{r}
+
+knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
+
+```
+
+
+The summary results of the Cox proportional hazards models with time varying treatment and adjustment for baseline covariates for any dementia outcome. 
+
+Overall, the analysis indicated that treatment with any lipid-regulating agent was associated with an increased HR of dementia, consisent across all dementia sub-types.  
+
+
+
+In terms of baseline confounders, the largest attenuation was seen on adjustment for age.
+
+
+
+&nbsp;
+
+```{r}
+
+cohort2results1 <- cohort2results[which(cohort2results$outcome=="Any dementia"&cohort2results$drug=="Any"&cohort2results$analysis!="6-month cutoff"&cohort2results$analysis!="Time-varying"),]
+
+cohort2results1$analysis <- gsub("TV - All","Time-varying treatment", cohort2results1$analysis)
+cohort2results1$analysis <- gsub("TV - with TV covariates","Time-varying treatment and covariates", cohort2results1$analysis)
+cohort2results1$analysis <- gsub("Indication bias","Time-varying treatment and covariates, adjusting for indication bias", cohort2results1$analysis)
+
+cohort2results1$covariates <- factor(cohort2results1$covariates, levels = c("none", "age/sex","full"))
+cohort2results1 <- cohort2results1[order(cohort2results1$covariates),]
+
+cohort2results1 <- cohort2results1[,c(3:9)]
+
+
+knitr::kable(cohort2results1, booktabs = TRUE, caption = 'Cohort 2 - Results from Cox proportional hazards regression of any dementia diagnosis on treatment with any lipid-regulating agent vs no treatment', row.names = FALSE, col.names = c("Analysis","Covariates","HR","Std Error", "P-value", "Upper 95%CI","Upper 95%CI"))
+
+```
+
+
+&nbsp;
+
+For the analyses above, the following baseline covariates were adjusted for: sex, age, charlson, Index multiple deprivation, consultation rate, alcohol (ever), smoking (ever), BMI, cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension. In analyses with time-varying covariates, a participants' cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension status was allowed to vary over time.
+
+&nbsp;
+
+## Mendelian randomization analysis
+
+
+#####
+
+# Discussion {#discussion}
+
+
+
+#####
+
+
+# Conclusions {#conclusion}
+
+
+
+#####
+
+## Supplementary tables and figures {#appendix}
+
+```{r}
+
+knitr::include_graphics(here::here("output", "fp_cox_alldem.jpeg"))
+
+```
+
+&nbsp;
+
+```{r}
+
+cohort2results2 <- cohort2results[which(cohort2results$analysis=="TV - with TV covariates" &cohort2results$covariates=="full"),]
+cohort2results2$outcome <- factor(cohort2results2$outcome, levels = c("Any dementia", "Probable AD","Possible AD", "Vascular dementia","Other dementia"))
+cohort2results2$drug <- factor(cohort2results2$drug, levels = c("Any", "Statins","Fibrates", "Bile acid sequestrants","Omega-3 Fatty Acid Groups","Ezetimibe"))
+
+cohort2results2 <- cohort2results2[order(cohort2results2$outcome,cohort2results2$drug ),]
+
+cohort2results2 <- cohort2results2[,c(1:2,5:10)]
+
+knitr::kable(cohort2results2, booktabs = TRUE, caption = 'Cohort 2 - Results from a time-varying Cox proportional hazards regression model comparing each drug with the control group. The following baseline covariates were adjusted for: sex, age, charlson, Index multiple deprivation, consultation rate, alcohol (ever), smoking (ever), and BMI. The following covariates were allowed to vary over time: Cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension', row.names = FALSE, col.names = c("Outcome","Drug","HR","Std Error", "P-value", "Upper 95%CI","Upper 95%CI","Number of participants"))
+
+```
+

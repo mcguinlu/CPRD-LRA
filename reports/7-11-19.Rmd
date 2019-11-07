@@ -1,0 +1,138 @@
+---
+title: November Meeting
+date: "Last updated: `r format(Sys.time(), '%d %B, %Y')`"
+csl: nature.csl
+output:
+  bookdown::word_document2:
+    toc: false
+    toc_depth: 3
+    reference_docx: word-styles-reference-01.docx
+  bookdown::pdf_document2:
+    bookdown::html_document2:
+    toc: true
+    toc_depth: 2
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen = 999)
+
+#Load relevant libraries and datasets from the 'outputs' folder
+library(data.table)
+library(here)
+
+cohort2description <- read.csv(here("output/","cohort2description.csv"),header=TRUE)
+cohort2table1 <- read.csv(here("output/","cohort2_table1.csv"),header=FALSE)
+cohort2missingdata <- read.csv(here("output/","cohort2missingdata.csv"),header=TRUE)
+cohort2results <- read.csv(here("output/","analysis-cohort2_reg.csv"),header=TRUE)
+
+```
+
+
+# CPRD Additional Analyses
+
+## Opening notes:
+
+* All anlyses used a complete case analysis
+* Effective sample size is now [TBC]
+
+
+&nbsp;
+
+## Adjusting for baseline cholesterol:
+
+Time-varying treatment analysis found increase HR in vascular dementia subgroup, but no strong evidence for an effect in the AzD subgroup. 
+
+Suggested that this was due to confounding by indication: 
+  
+  
+  In attempt to deal with the suggested confounding by indication, adjusted for baseline total cholesterol test result. No effect on probable AzD results, but apparent increased in HR for vascular dementia (though consistent with chance).
+
+```{r, fig.cap="Any dementia results, with and without adjustment for baseline total cholestoerol"}
+
+knitr::include_graphics(here::here("output", "fp_cox_alldem.jpeg"))
+
+```
+
+```{r, fig.cap="Probable AzD results, with and without adjustment for baseline total cholestoerol"}
+
+knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
+
+```
+
+```{r, fig.cap="Vascular dementia results, with and without adjustment for baseline total cholestoerol"}
+
+knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
+
+```
+
+
+
+## Baseline TC as a poor predictor of statin prescription [Regression discontinuity analysis]
+
+Previously suggested that we perform a regression discontinuity analysis. 
+Similar analysis performed by Lauren Scott of CLARHC using the QRISK2 score.
+*Found that QRISK2 is a poor instrument for statin prescription - prescription within 60 days was ~10% below NICE recommended cut-off and only ~30% above, even up to very high values of QRISK2. 
+*Analysis intended to look at side effects, but was unable to show that statins lowered LDL-c levels 3-6 months after the date the QRISK2 score was recorded.
+
+Assuming that the QRISK is a better indicator of statin prescription that total cholesterol alone, I do not intend to run an RDanalysis using total cholesterol. 
+
+These findings would also explain the lack of attenuation when including baseline TC in the models in an effort to address confounding by indication, as it appears total cholesterol does not influence whether someone is prescribed statins. 
+
+Lauren has asked if we can replicate the finding in our dataset [in progress] 
+
+&nbsp;
+
+## Selection bias in the inclusion
+
+Noted by Julian and Yoav, likely to be some selection bias in the way people are selected if index event is prescription of a drug, as not capturing those that had the same pre-selection testing/consultations but were not prescribed a drug. 
+
+This is addressed in the current complete case analysis, as excluding those with an index event of drug prescription as they do not have a baseline total cholesterol meaurement.
+
+This will become important if we decide not to include baseline total cholesterol as a covariate (see Section \@ref(covariate), below).
+
+&nbsp;
+
+## Covariate selection {#covariate}
+
+From post-estimation analyses, it appears that adjusting many covariates is redundant. The largest attenuation of the effect comes from adjusting for age at baseline. 
+
+Including all of the covariates significantly reduces the effective sample size of the complete case analysis from 1711679 to 773297 participants. 
+
+
+
+```{r, fig.cap="Postestimation analysis of a full adjusted model (including baseline total cholesterol) using any dementia diagnosis as the outcome. This show little effect "}
+
+knitr::include_graphics(here::here("output", "postestimation - full+tc.png"))
+
+```
+
+Better to exclude these and increase sample size?
+  
+  &nbsp;
+
+## Outcomes
+
+Reason to distinguish between prob ad and poss ad? 
+  Why not just lump them altogether?
+  
+  &nbsp;
+
+
+## Differential misclassification of AzD vs Vascular dementia using 
+
+Likely that there is misclassification between Allzheimer's disease and Vascular dementia
+
+Thows results for AzD into question, as likely that efffect is there, but due to statin use, it is being classified as VaD.
+
+&nbsp;
+
+## results by age age group at baseline:
+
+```{r, fig.cap="Probable AD results by age group"}
+
+knitr::include_graphics(here::here("output", "fp_cox_probad_age.jpeg"))
+
+```
+
+&nbsp;
