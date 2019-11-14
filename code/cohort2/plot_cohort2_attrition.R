@@ -2,9 +2,10 @@ library(DiagrammeR)
 library(htmltools)
 library(webshot)
 library(dplyr)
+library(here)
 
 #Define main dataset
-main <- read.csv("./output/cohorta2_attrition.csv")
+main <- read.csv(here("output","cohorta2_attrition.csv"))
 
 # Define node names
 main[1,2] <- paste0("M0")

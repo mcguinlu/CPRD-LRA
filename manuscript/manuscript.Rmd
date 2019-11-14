@@ -15,13 +15,16 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE) # Remove to knit with plots/data
 options(scipen = 999)
+```
 
+# Cover page
+
+```{r}
 #Load relevant libraries and datasets from the 'outputs' folder
 library(data.table)
 library(here)
-
 
 cohort2description <- read.csv(here("output/","cohort2description.csv"),header=TRUE)
 cohort2table1 <- read.csv(here("output/","cohort2_table1.csv"),header=FALSE)
@@ -30,13 +33,14 @@ cohort2results <- read.csv(here("output/","analysis-cohort2_reg.csv"),header=TRU
 
 ```
 
-# Cover page
-
 __Title: __  
+
 Repurposing lipid regulating drugs for the prevention of Alzheimer's disease
 
+&nbsp;
 
 __Authors and Affiliations:__  
+
 Luke A McGuinness^1,2^, Venexia M Walker^1,2^, Neil M Davies^1,2^, Richard M Martin^1,2^, and Patrick G Kehoe^3,4^
 
 (1) MRC University of Bristol Integrative Epidemiology Unit, Bristol, UK
@@ -44,7 +48,10 @@ Luke A McGuinness^1,2^, Venexia M Walker^1,2^, Neil M Davies^1,2^, Richard M Mar
 (3) Dementia Research Group, Bristol Medical School, University of Bristol, Bristol, UK
 (4) Bristol Medical School: Translational Health Sciences, University of Bristol, Bristol, UK
 
+
+
 __Corresponding author:__  
+
 Luke McGuinness; Bristol Medical School, University of Bristol,
 Canynge Hall, 39 Whatley Road, Bristol, BS8 2PS, United Kingdom.; luke.mcguinness@bristol.ac.uk
 
@@ -81,22 +88,68 @@ Canynge Hall, 39 Whatley Road, Bristol, BS8 2PS, United Kingdom.; luke.mcguinnes
 #####
 
 # Methods {#methods}
-## CPRD Analysis
 
-## Mendelian randomization analysis
+**Study design**  
 
+We performed a prospective cohort study using data from the CPRD, a large UK primary healthcare database. The CPRD 
+
+
+Our inital sample included all patients included all participants who had a flag for "research quality" data, registered at a participating practice between 1-1-1987 and 29-2-2016.
+
+An ISAC protocol for this analysis was pre-registered, and amendents to this can been seen in the Supplemental Table \@ref(XXXX).  
+
+&nbsp;
+
+**Participants**
+
+We included participants with an index event of a code for a diagnosis of hypercholesterolaemia, a code for prescription of a lipid regulating agent (statin, ezetimibe, etc.) or a test result where total cholesterol level is was greater than >4 mmol/L or LDL level is between 2 mmol/L.
+
+Participants were follow until the earliest of: an outcome of interest; death; end of follw-up (29-2-2016); last registration with their GP practice.
+
+Participants were removed from our sample if they: had less than 40 years of age; had less than 12 months of "research quality" data; were initally prescribed more than one lipid regulating agent, were diagnosed with dementia before/on the date of the index event. 
+
+We also excluded patients with 
+
+&nbsp;
+
+**Exposures**
+
+We considered 6 (or 7) lipid regulating drug clases based on groupings in the British National Formulary (BNF). 
+
+&nbsp;
+
+**Outcomes**
+
+Link to decision tree (Supp table 2 )
+
+&nbsp;
+
+**Analysis plan**
+
+To address the potential for immortal time, we employed a time-varying indicator of treatment status in order to correctly allocate time-at-risk to the exposed and unexposed groups. We also adjusted for a range of baseline covariates including sex, age, charlson, Index multiple deprivation, consultation rate, alcohol (ever), smoking (ever), BMI, cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension.
+
+&nbsp;
+
+**Code lists and scripts**
+
+The outcome and covariates in this analysis were each defined by a list of codes, recorded at the time of the consultation. Namely, we used sets of READ, Product and XXXXX codes to define diagnoses, prescriptions and test results respectively. The complete code lists for this study, in addition to the cleaning and analysis scripts, are available on Github (https://github.com/mcguinlu/CPRD-LRA).
+ 
+ &nbsp;
+ 
+**Sensitivity analyses**
+
+Be clear that it is a complete case analysis -> in effect, this means that you are only selecting on the basis of inital test results (not diagnosis or prescription).
 
 
 #####
 
 # Results {#results}
-## CPRD Analysis
 
-Table of characteristics
+**Patient characteristics**
 
-&nbsp;
+* **Seperate out other descriptive statistics from those adjusted for in the analysis e.g. stopped**
 
-``` {r cohort2table1}
+``` {r table1}
 
 cohort2table1 <- data.table::transpose(cohort2table1)
 colnames(cohort2table1) <- as.character(unlist(cohort2table1[1,]))
@@ -129,8 +182,7 @@ knitr::kable(cohort2table1.disp, booktabs = TRUE, caption = 'Patient characteris
 
 ```
 
-```{r, eval = TRUE}
-
+```{r}
 total <- cohort2missingdata[1,1]
 totalpercent <- round(total/as.numeric(cohort2table1[1,1])*100,2)
 totaltext <- paste0(total, " participants (", totalpercent,"%)")
@@ -155,31 +207,23 @@ prior.all<- paste0(as.numeric(cohort2table1[20,1]))
 prior.none <- paste0(as.numeric(cohort2table1[20,2]))
 prior.statins <- paste0(as.numeric(cohort2table1[20,3]))
 
-```
 
-The proportions of participants with missing covariate information were comparable to those presented in the anti-hypertensives paper.
+percentage.statins <- 
+  paste0(round(as.numeric(cohort2table1[1,3])/sum(cohort2table1[1:9])*100, 2), "%")
 
-* Full covariate information was available for `r totaltext`.
-* IMD 2010 score, a proxy for socioeconomic position that is measured as twentiles with 1 indicating the least deprived and 20 indicating the most deprived, was missing for `r imdtext`.
-*  Alcohol status was missing for `r alcoholtext`. 
-*  Smoking status was missing for `r smokingtext`.
-* BMI, or a calculated BMI from height and weight measurements, was missing for `r bmitext`.
-
-&nbsp;
-
-Table \@ref(tab:cohort2table1) shows the proportion of participants receviving each drug class who subsequently stoppped (greater than 6 months between last prescription and end of data), added (second drug prescribed before last prescription for the index_drug) or switched (second drug prescribed after last prescription for the index_drug).
-
-&nbsp;
-
-Note: the discrepancies between the number of participants in the table of characteristics and that displayed in the forest plot is due to `r prior.all` participants having a diagnosis date prior to the index date (`r prior.none` in the control group and `r prior.statins` in the statin group).
-
-&nbsp;
-
-```{r}
 
 ```
 
 
+* Full covariate information was available for `r #totaltext`.
+* IMD 2010 score, a proxy for socioeconomic position that is measured as twentiles with 1 indicating the least deprived and 20 indicating the most deprived, was missing for `r #imdtext`.
+*  Alcohol status was missing for `r #alcoholtext`. 
+*  Smoking status was missing for `r #smokingtext`.
+* BMI, or a calculated BMI from height and weight measurements, was missing for `r #bmitext`.
+
+Table \@ref(tab:table1) shows the proportion of participants recieving each drug class who subsequently stoppped (greater than 6 months between last prescription and end of data), added (second drug prescribed before last prescription for the index_drug) or switched (second drug prescribed after last prescription for the index_drug).
+
+Note: the discrepancies between the number of participants in the table of characteristics and that displayed in the forest plot is due to `r #prior.all` participants having a diagnosis date prior to the index date ( `r #prior.none` in the control group and `r #prior.statins` in the statin group). **-> need to remove these people from the sample: exclude at the attrition level.**
 
 ```{r}
 
@@ -187,16 +231,29 @@ knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
 
 ```
 
+&nbsp;
 
-The summary results of the Cox proportional hazards models with time varying treatment and adjustment for baseline covariates for any dementia outcome. 
+**Any dementia**
 
-Overall, the analysis indicated that treatment with any lipid-regulating agent was associated with an increased HR of dementia, consisent across all dementia sub-types.  
+* **Use forest plots without second line adjusting for TC, and include number of events per subgroup in the accompanying table**
+
+The summary results of the Cox proportional hazards models with time varying treatment and adjustment for baseline covariates for any dementia outcome are presented in Figure \@ref(XXXX)
+
+
+Overall, the analysis indicated that treatment with any lipid-regulating agent was associated with a small increased HR of dementia. 
+
+However, it appears that this subgroup
 
 
 
 In terms of baseline confounders, the largest attenuation was seen on adjustment for age.
 
+Figure \@ref(XXXX) shows the results of our analysis for the effect of
 
+
+
+
+## 
 
 &nbsp;
 
@@ -221,16 +278,56 @@ knitr::kable(cohort2results1, booktabs = TRUE, caption = 'Cohort 2 - Results fro
 
 &nbsp;
 
-For the analyses above, the following baseline covariates were adjusted for: sex, age, charlson, Index multiple deprivation, consultation rate, alcohol (ever), smoking (ever), BMI, cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension. In analyses with time-varying covariates, a participants' cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension status was allowed to vary over time.
-
+For the analyses above, the following baseline covariates were adjusted for: sex, age, charlson, Index multiple deprivation, consultation rate, alcohol (ever), smoking (ever), BMI, cardiovascular disease, coronary bypass surgery, coronary artery disease, peripheral arterial disease, and hypertension.
 &nbsp;
 
-## Mendelian randomization analysis
 
 
 #####
 
 # Discussion {#discussion}
+
+**Main findings**
+
+Our analysis indicated that there was an increased risk of any dementia diagnosis associated with taking a lipid regulating agent. However, examining the dementia subgroups, this apparent effect is being driven by the vascular dementia subgroup while for the probable Alzheimer's disease subgroup, no effect was observed. 
+
+In all cases, the overall HR estimate reflects that seen in the statin subgroup, as a substantial majority of participants taking a lipid regulating agent were taking a statin ( `r #percentage.statins`).
+
+
+
+**Explanations**
+
+We expect that there are two main drivers of the increased HR seen in the any dementia group, due primarily to the substantially increased HR in the vascular dementia subgroup:
+
+ Differential misclassification
+
+
+ Uncontrolled confounders
+
+A recent study in the UK Biobank demonstrated that an Alzheimer's disease polygenic risk score was assoiated with unspecified Alzheimer's and vascular dementia, but also was associated with self report of raised cholesterol levels, a diagnosis of hypercholesterolaemia, and a history of taking lipid regulating agents such as statins or ezetimibe
+
+* **Include confounding by indication**
+
+**Comparison to other sources of evidence**
+
+Recent Mendelian randomisation study examining whether genetic variation of lipid-lowering drug targets is associated with Alzheimer's disease (AD) risk. (@doi:10.1002/ana.25642)
+
+Models for HMGCR, APOB and NPC1L1 did not suggest that the use of related lipid-lowering drug classes would affect AD risk. In contrast, exposure to PCSK9 inhibitors was predicted to increase AD risk in both of the AD samples (combined odds ratio per standard deviation lower LDL-C inducible by the drug target = 1.45; 95% confidence interval: 1.23, 1.69).
+
+
+
+
+**Limitations**
+
+
+
+Complete case analysis
+
+Large amounts of missing data on some key variables
+
+Selection bias if including those with a prescription as their index test result.
+
+
 
 
 
