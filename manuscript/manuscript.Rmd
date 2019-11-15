@@ -14,17 +14,19 @@ output:
       toc_depth: 2
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, eval = FALSE) # Remove to knit with plots/data
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE) # Remove to knit with plots/data
 options(scipen = 999)
+
+#Load relevant libraries and datasets from the 'outputs' folder
+library(data.table)
+library(here)
 ```
 
 # Cover page
 
 ```{r}
-#Load relevant libraries and datasets from the 'outputs' folder
-library(data.table)
-library(here)
+
 
 cohort2description <- read.csv(here("output/","cohort2description.csv"),header=TRUE)
 cohort2table1 <- read.csv(here("output/","cohort2_table1.csv"),header=FALSE)
@@ -150,7 +152,6 @@ Be clear that it is a complete case analysis -> in effect, this means that you a
 * **Seperate out other descriptive statistics from those adjusted for in the analysis e.g. stopped**
 
 ``` {r table1}
-
 cohort2table1 <- data.table::transpose(cohort2table1)
 colnames(cohort2table1) <- as.character(unlist(cohort2table1[1,]))
 cohort2table1 = cohort2table1[-1, ]
@@ -209,21 +210,20 @@ prior.statins <- paste0(as.numeric(cohort2table1[20,3]))
 
 
 percentage.statins <- 
-  paste0(round(as.numeric(cohort2table1[1,3])/sum(cohort2table1[1:9])*100, 2), "%")
-
+  paste0(round(as.numeric(cohort2table1[1,3])/sum(as.numeric(cohort2table1[1,1:9]))*100, 2), "%")
 
 ```
 
 
-* Full covariate information was available for `r #totaltext`.
-* IMD 2010 score, a proxy for socioeconomic position that is measured as twentiles with 1 indicating the least deprived and 20 indicating the most deprived, was missing for `r #imdtext`.
-*  Alcohol status was missing for `r #alcoholtext`. 
-*  Smoking status was missing for `r #smokingtext`.
-* BMI, or a calculated BMI from height and weight measurements, was missing for `r #bmitext`.
+* Full covariate information was available for `r totaltext`.
+* IMD 2010 score, a proxy for socioeconomic position that is measured as twentiles with 1 indicating the least deprived and 20 indicating the most deprived, was missing for `r imdtext`.
+*  Alcohol status was missing for `r alcoholtext`. 
+*  Smoking status was missing for `r smokingtext`.
+* BMI, or a calculated BMI from height and weight measurements, was missing for `r bmitext`.
 
 Table \@ref(tab:table1) shows the proportion of participants recieving each drug class who subsequently stoppped (greater than 6 months between last prescription and end of data), added (second drug prescribed before last prescription for the index_drug) or switched (second drug prescribed after last prescription for the index_drug).
 
-Note: the discrepancies between the number of participants in the table of characteristics and that displayed in the forest plot is due to `r #prior.all` participants having a diagnosis date prior to the index date ( `r #prior.none` in the control group and `r #prior.statins` in the statin group). **-> need to remove these people from the sample: exclude at the attrition level.**
+Note: the discrepancies between the number of participants in the table of characteristics and that displayed in the forest plot is due to `r prior.all` participants having a diagnosis date prior to the index date ( `r prior.none` in the control group and `r prior.statins` in the statin group). **-> need to remove these people from the sample: exclude at the attrition level.**
 
 ```{r}
 
@@ -291,7 +291,7 @@ For the analyses above, the following baseline covariates were adjusted for: sex
 
 Our analysis indicated that there was an increased risk of any dementia diagnosis associated with taking a lipid regulating agent. However, examining the dementia subgroups, this apparent effect is being driven by the vascular dementia subgroup while for the probable Alzheimer's disease subgroup, no effect was observed. 
 
-In all cases, the overall HR estimate reflects that seen in the statin subgroup, as a substantial majority of participants taking a lipid regulating agent were taking a statin ( `r #percentage.statins`).
+In all cases, the overall HR estimate reflects that seen in the statin subgroup, as a substantial majority of participants taking a lipid regulating agent were taking a statin ( `r percentage.statins`).
 
 
 
