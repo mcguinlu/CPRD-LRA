@@ -93,12 +93,16 @@ Canynge Hall, 39 Whatley Road, Bristol, BS8 2PS, United Kingdom.; luke.mcguinnes
 
 **Study design**  
 
-We performed a prospective cohort study using data from the CPRD, a large UK primary healthcare database. The CPRD 
-
+We performed a prospective cohort study using data from the CPRD, a large UK primary healthcare  database. [@10.1093/ije/dyv098] The CPRD 
 
 Our inital sample included all patients included all participants who had a flag for "research quality" data, registered at a participating practice between 1-1-1987 and 29-2-2016.
 
 An ISAC protocol for this analysis was pre-registered, and amendents to this can been seen in the Supplemental Table \@ref(XXXX).  
+
+
+
+
+A protocol for the study was published in advance. [@Walkere012044]
 
 &nbsp;
 
@@ -140,7 +144,7 @@ The outcome and covariates in this analysis were each defined by a list of codes
  
 **Sensitivity analyses**
 
-Be clear that it is a complete case analysis -> in effect, this means that you are only selecting on the basis of inital test results (not diagnosis or prescription).
+Be clear that it is a complete case analysis -> in effect, this means that you are only selecting on the basis of inital test results (not diagnosis or prescription). 
 
 
 #####
