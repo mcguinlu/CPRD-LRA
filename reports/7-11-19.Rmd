@@ -25,114 +25,188 @@ cohort2description <- read.csv(here("output/","cohort2description.csv"),header=T
 cohort2table1 <- read.csv(here("output/","cohort2_table1.csv"),header=FALSE)
 cohort2missingdata <- read.csv(here("output/","cohort2missingdata.csv"),header=TRUE)
 cohort2results <- read.csv(here("output/","analysis-cohort2_reg.csv"),header=TRUE)
+cohort2attrition <- read.csv(here("output/","cohort2_attrition.csv"), header = FALSE)
 
 ```
 
 
 # CPRD Additional Analyses
 
-## Opening notes:
+## Opening notes
 
-* All anlyses used a complete case analysis
-* Effective sample size is now [TBC]
-
+* All analyses used a complete case analysis.
+* Effective sample size (number of participants with complete covariate information) is `r cohort2table1[10,2]`, compared to the `r cohort2attrition[15,1]` participants who were eligible for the study.
+* Covariates adjusted for in the full model: _age, sex, coronary artery disease, coronary bypass surgery, cardiovascular disease, Carlson index, IMD20-10, consultation rate, alcohol (ever), smoking (ever), BMI, peripheral arterial disease, & hypertension (+/- baseline total cholesterol)_. 
 
 &nbsp;
 
-## Adjusting for baseline cholesterol:
+## Adjusting for baseline cholesterol
 
-Time-varying treatment analysis found increase HR in vascular dementia subgroup, but no strong evidence for an effect in the AzD subgroup. 
+__Results__
 
-Suggested that this was due to confounding by indication: 
-  
-  
-  In attempt to deal with the suggested confounding by indication, adjusted for baseline total cholesterol test result. No effect on probable AzD results, but apparent increased in HR for vascular dementia (though consistent with chance).
+The original time-varying treatment analysis found an overall increased HR, driven mainly by the the large effect seen in the vascular dementia subgroup.
 
-```{r, fig.cap="Any dementia results, with and without adjustment for baseline total cholestoerol"}
+It was previously suggested that this was due to confounding by indication, where a higher baseline total cholesterol/LDL-c test result would result in someone being more likely to be prescribed statins and also more likely to develop vascular dementia. 
+
+In an attempt to deal with this, I adjusted each previous analysis to take account of baseline total cholesterol test results (analyses presented in grey on the forest plots below). The black lines are the results of analysis adjusted for all covariates listed above except for baseline total cholesterol. There was no noticeable effect on the probable Alzheimer's results, but adjusting for baseline total cholesterol appears to increase the HR for vascular dementia (though the increase is consistent with chance).
+
+See Section \@ref(rda) for a possible explanation for these findings.
+
+&nbsp;
+
+```{r, fig.cap="Dementia subgroup results, with and without adjustment for baseline total cholesterol"}
 
 knitr::include_graphics(here::here("output", "fp_cox_alldem.jpeg"))
 
 ```
 
-```{r, fig.cap="Probable AzD results, with and without adjustment for baseline total cholestoerol"}
+&nbsp;
+
+```{r, fig.cap="Probable Alzheimer's disease results by drug class, with and without adjustment for baseline total cholesterol"}
 
 knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
 
 ```
 
-```{r, fig.cap="Vascular dementia results, with and without adjustment for baseline total cholestoerol"}
+&nbsp;
 
-knitr::include_graphics(here::here("output", "fp_cox_probad.jpeg"))
+```{r, fig.cap="Vascular dementia results by drug class, with and without adjustment for baseline total cholesterol"}
+
+knitr::include_graphics(here::here("output", "fp_cox_vad.jpeg"))
 
 ```
 
 
 
-## Baseline TC as a poor predictor of statin prescription [Regression discontinuity analysis]
+&nbsp;
 
-Previously suggested that we perform a regression discontinuity analysis. 
-Similar analysis performed by Lauren Scott of CLARHC using the QRISK2 score.
-*Found that QRISK2 is a poor instrument for statin prescription - prescription within 60 days was ~10% below NICE recommended cut-off and only ~30% above, even up to very high values of QRISK2. 
-*Analysis intended to look at side effects, but was unable to show that statins lowered LDL-c levels 3-6 months after the date the QRISK2 score was recorded.
+__Questions__
 
-Assuming that the QRISK is a better indicator of statin prescription that total cholesterol alone, I do not intend to run an RDanalysis using total cholesterol. 
-
-These findings would also explain the lack of attenuation when including baseline TC in the models in an effort to address confounding by indication, as it appears total cholesterol does not influence whether someone is prescribed statins. 
-
-Lauren has asked if we can replicate the finding in our dataset [in progress] 
+* Is there any other important confounder that we may be missing, that could account for the increased HR, particular in the vascular dementia group? 
 
 &nbsp;
 
-## Selection bias in the inclusion
+## Regression discontinuity analysis {#rda}
 
-Noted by Julian and Yoav, likely to be some selection bias in the way people are selected if index event is prescription of a drug, as not capturing those that had the same pre-selection testing/consultations but were not prescribed a drug. 
+__Comments__
 
-This is addressed in the current complete case analysis, as excluding those with an index event of drug prescription as they do not have a baseline total cholesterol meaurement.
+It was previously suggested that I perform a regression discontinuity analysis. In preparation for this, I spoke to Lauren Scott of the CLARHC who has performed a similar analysis in the CPRD using the QRISK2 score instead of a lipid test results. This analysis:
 
-This will become important if we decide not to include baseline total cholesterol as a covariate (see Section \@ref(covariate), below).
+* found that QRISK2 is a poor instrument for statin prescription. Below NICE recommended cut-off, the probability of prescription of statin within 60 days was ~10%, and above the cutoff, the probability increased to only ~20% , even at quite high values of QRISK2 (Figure \@ref(fig:rda-fig), below). 
+  
+* had intended to look at side effects of statin use, but was unable to even demonstrate that statins lowered LDL-c levels 3-6 months after the date the QRISK2 score was recorded.
+
+```{r rda-fig, fig.cap="Results of a regression discontinuity analysis using QRISK2 score, showing a small discontinuity in statin prescription above and below NICE recommended cut-off. Graphic courtesy of Lauren Scott/Kate Tilling."}
+
+knitr::include_graphics(here::here("output", "rda-statins.png"))
+
+```
 
 &nbsp;
+
+Based on the above analysis showing that even the QRISK2 score is a poor indicator of statin prescription, and assuming that it is still a better indicator than total cholesterol alone, I do not think it is worthwhile running a regression discontinuity analysis using total cholesterol. 
+
+These findings may also explain the lack of attenuation when including baseline total cholesterol in the models above in an effort to address confounding by indication, as it appears total cholesterol does not substantially influence whether someone is prescribed statins or not.
+
+&nbsp;
+
+__Questions__
+
+* Lauren has asked if we can replicate her analysis in our data-set, just to ensure that the findings were not a coding error on her part - I am assuming that this is okay for me to do?
+
+&nbsp;
+
+## Results by age group at baseline
+
+__Results__
+
+At Yoav's suggestion, I ran the fully adjusted models (including baseline cholesterol) in three age subgroups.
+
+I had originally intended to break participants up into four categories: <65,65-74,75-84,>=85. However, the numbers were extremely low in the oldest age category, and so I split them into three groups instead: <65,65-74,>=75.
+
+&nbsp;
+
+```{r, fig.cap="Effect of any lipid regulating agent on any dementia, by age group"}
+
+knitr::include_graphics(here::here("output", "fp_cox_alldem_age.jpeg"))
+
+```
+
+&nbsp;
+
+```{r, fig.cap="Effect of different drug classes on Probable AD, by age group. Note, some of the analyses give funny results due to the small number of both participants and events in that category."}
+
+knitr::include_graphics(here::here("output", "fp_cox_probad_age.jpeg"))
+
+```
+
+&nbsp;
+
+It appears that the increased HRs seen are being driven by the youngest age groups, and that the effect is attenuated, or even qualitatively different (e.g. in the Possible AD subgroup) between the youngest and oldest categories.
+
+&nbsp;
+
+__Questions__
+
+* How to interpret these findings?
+
+
+&nbsp;
+
 
 ## Covariate selection {#covariate}
 
-From post-estimation analyses, it appears that adjusting many covariates is redundant. The largest attenuation of the effect comes from adjusting for age at baseline. 
+__Results__
 
-Including all of the covariates significantly reduces the effective sample size of the complete case analysis from 1711679 to 773297 participants. 
+From a series of post-estimation analyses, it appears that adjusting for many of the covariates included in the final model is unnecessary. The largest change in the effect comes from adjusting for age at baseline, following which there is very little further movement of the point estimate (an example is provided using the model for the effect of any drug class on any dementia outcome, Figure \@ref(fig:postest)).
 
 
-
-```{r, fig.cap="Postestimation analysis of a full adjusted model (including baseline total cholesterol) using any dementia diagnosis as the outcome. This show little effect "}
+```{r postest, fig.cap="Postestimation analysis of a full adjusted model (including baseline total cholesterol) of the effect of any drug on any dementia diagnosis."}
 
 knitr::include_graphics(here::here("output", "postestimation - full+tc.png"))
 
 ```
 
-Better to exclude these and increase sample size?
+&nbsp;
+
+__Questions__
+
+* Including all of the covariates significantly reduces the effective sample size of the complete case analysis from `r cohort2table1[10,2]` to  `r cohort2attrition[15,1]` participants. Would it be better to exclude some of these covariates and therefore increase our effective sample size?
   
-  &nbsp;
+&nbsp;
 
-## Outcomes
+## Differential misclassification of Alzheimer's disease vs vascular dementia 
 
-Reason to distinguish between prob ad and poss ad? 
-  Why not just lump them altogether?
-  
-  &nbsp;
+__Comments__
 
+It seems likely that there is misclassification between Alzheimer's disease and vascular dementia, as many of the methods to differentiate between the two conditions ask about cardiovascular history, including previous statin use. 
 
-## Differential misclassification of AzD vs Vascular dementia using 
-
-Likely that there is misclassification between Allzheimer's disease and Vascular dementia
-
-Thows results for AzD into question, as likely that efffect is there, but due to statin use, it is being classified as VaD.
+To me, this means that it is likely that the vascular dementia results are overestimated, but also that the probable Alzheimer's disease are underestimated (if you are on statins and you have a memory complaint, you are more likely to be classified as vascular dementia than Alzheimer's). This could cause an issue as we had intended to make the Alzheimer's disease results the core of the manuscript. 
 
 &nbsp;
 
-## results by age age group at baseline:
+__Questions__
 
-```{r, fig.cap="Probable AD results by age group"}
+* Is this a reasonable interpretation?
+* Is there any way to examine/tackle this potential misclassification in the analysis?
 
-knitr::include_graphics(here::here("output", "fp_cox_probad_age.jpeg"))
+&nbsp;
 
-```
+## Selection bias in the inclusion criteria
+
+__Comments__
+
+This was suggested by Yoav and Julian in my most recent supervisory meeting. It is possible that some selection bias was introduced in the way people are selected into the study if their index event is prescription of a drug. In this case, the analysis will not include those patients that same pre-selection testing/consultations but were not prescribed a drug. 
+
+This bias is not an issue in the current complete case analysis, as those with an index event of prescription of a drug are excluded as they do not have a baseline total cholesterol measurement.
+
+However, this potential for bias will become important if we decide not to include baseline total cholesterol as a covariate (see Section \@ref(covariate), above).
+
+&nbsp;
+
+__Questions__
+
+* Is this a reasonable interpretation?
+* Is there any way around this if we do decide to include those with a drug prescription as their index event?
 
 &nbsp;
