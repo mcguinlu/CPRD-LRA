@@ -3,7 +3,7 @@
 ***********************************
 
 * Edit to your own path!
-global path "//ads.bris.ac.uk/folders/Health Sciences/SafeHaven/CPRD Projects UOB/Projects/15_246/LRA-IV"
+global path "//ads.bris.ac.uk/folders/Health Sciences/SafeHaven/CPRD Projects UOB/Projects/15_246/CPRD-LRA"
 global dofiles "$path/code"
 global output "$path/output"
 global data "$path/data"
@@ -30,7 +30,7 @@ global dofiles "$path/code/cohort2"
 
 * Generate data on missing covariate information -------------------------------
 
-//run "$dofiles/missingdata.do"
+run "$dofiles/missingdata.do"
 
 * Run Cox regression analysis --------------------------------------------------
 
@@ -40,4 +40,4 @@ run "$dofiles/analysis2.do"
 clear
 set obs 0
 gen pushover = ""
-save "$path/pushover.dta", replace
+save "$path/pushover.dta"
