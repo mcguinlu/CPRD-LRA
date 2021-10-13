@@ -1,43 +1,86 @@
 ***********************************
-* Cohort A.2 - "At risk" analysis *
+* CPRD Analysis: 
+* Author: Luke McGuinness (adapted from code written by Venexia Walker)
 ***********************************
 
+* Define paths -----------------------------------------------------------------
 * Edit to your own path!
 global path "//ads.bris.ac.uk/folders/Health Sciences/SafeHaven/CPRD Projects UOB/Projects/15_246/CPRD-LRA"
-global dofiles "$path/code"
 global output "$path/output"
 global data "$path/data"
-run "$dofiles/codedict.do"
+global results "$path/output/files"
 
-* Define covariates to be retained in all files --------------------------------
+***********************************
+* LOAD GLOBAL VARIABLES *
+***********************************
+global dofiles "$path/code/00_extract_and_clean"
 
-global hc_basic "patid pracid gender region yob frd crd uts tod lcd deathdate fup accept data_* index_* diagnosis* studytime drug5 drug10 drug_fup male pres_year_* exposed dementia_within_6 ssa first_drug first_drug_date first_drug_consid first_drug_staff first_drug_last_date index_baseline_tc index_baseline_ldl" // 
-global hc_cov "male index_age_start cad cbs cvd bmi charlson imd2010 cons_rate smoking alcohol pad hyp"
+* Load code dictionary ---------------------------------------------------------
+
+run "$dofiles/1-code_dictionary.do"
+
+***********************************
+* DEFINE COHORT *
+***********************************
+global dofiles "$path/code/01_cohort_definition"
 
 * Generate cohort --------------------------------------------------------------
 
-global dofiles "$path/code/cohort2"
+run "$dofiles/1-create_cohort.do"
 
-//run "$dofiles/cohort2.do"
+* Apply inclusion criteria  ----------------------------------------------------
 
-* Add covariates (Note: cov.do requires cov_*.do) ------------------------------
+run "$dofiles/2-apply_criteria.do"
 
-//run "$dofiles/cov2.do"
+* Add covariates  --------------------------------------------------------------
 
-* Gerenate data for Table 1 ----------------------------------------------------
+run "$dofiles/3-add_covariates.do"
 
-//run "$dofiles/toc.do"
+* Impute missing variables and create final analysis datasets  -----------------
+* This takes a long time!
+
+//run "$dofiles/4-imputation.do"
+
+***********************************
+* MAIN ANALYSIS *
+***********************************
+global dofiles "$path/code/02_analysis"
+
+* Run primary Cox regression analysis ------------------------------------------
+
+run "$dofiles/1-primary-analysis.do"
+
+* Genenate data for Table of crude rates ---------------------------------------
+
+run "$dofiles/2-crude_rate_table.do"
+
+* Genenate data for Table of characteristics -----------------------------------
+
+run "$dofiles/3-table_of_characteristics.do"
 
 * Generate data on missing covariate information -------------------------------
 
-run "$dofiles/missingdata.do"
+run "$dofiles/4-missing_data_summary.do"
 
-* Run Cox regression analysis --------------------------------------------------
+* Generate data on summary characteristics for text ----------------------------
 
-run "$dofiles/analysis2.do"
+run "$dofiles/5-characteristics_text.do"
 
-* Generate indicator for pushover message
-clear
-set obs 0
-gen pushover = ""
-save "$path/pushover.dta"
+***********************************
+* SENSITIVITY ANALYSIS *
+***********************************
+global dofiles "$path/code/03_sensitivity"
+
+run "$dofiles/1-control_outcomes.do"
+
+run "$dofiles/2-complete_case.do"
+
+run "$dofiles/3-statin_properties.do"
+
+run "$dofiles/5-entry_year.do"
+
+run "$dofiles/6-pregnancy_cohort.do"
+
+run "$dofiles/7-smeeth_codes.do"
+
+
