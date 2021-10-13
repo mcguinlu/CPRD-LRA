@@ -49,17 +49,13 @@ run "$dofiles/raw_cprd.do"
 
 * Extract test result events ---------------------------------------------------
 
-//run "$dofiles/events_test.do"
-//events_test "hc_testrisk" "test" "(enttype==163 & test_data1==3 & test_data2>=4) | (enttype==177 & test_data1==3 & test_data2>=2)"
-//events_test "hc_testcond" "test" "(enttype==163 & test_data1==3 & test_data2>=5) | (enttype==177 & test_data1==3 & test_data2>=3)"
-
 run "$dofiles/events_test.do"
 events_test "tc_all" "test" "(enttype==163 & test_data1==3)" // TC
 events_test "ldl_all" "test" "(enttype==177 & test_data1==3)" // LDL
 
 * Extract ICD events -----------------------------------------------------------
 
-//run "$dofiles/events_icd.do"
+run "$dofiles/events_icd.do"
 
 * Extract covariate events -----------------------------------------------------
 
