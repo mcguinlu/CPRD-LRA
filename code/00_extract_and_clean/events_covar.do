@@ -1,4 +1,4 @@
-local csvfiles "cm_hyp.csv cm_pad.csv"
+local csvfiles "cm_hyp.csv cm_pad.csv cm_ckd.csv cm_dm_type1.csv cm_dm_type2.csv"
 
 foreach file in `csvfiles' {
 	import delimited using "$data/covariates/csv/`file'", clear
@@ -10,10 +10,11 @@ foreach file in `csvfiles' {
 	save "$data/covariates/stata/`noextension'", replace
 }
 	
-local dtafiles "cm_hyp.dta cm_pad.dta"
+local dtafiles "cm_dm_type1.dta cm_dm_type2.dta"
 	
 qui foreach file in `dtafiles' {
 	local event=subinstr("`file'",".dta","",.)
+	noi di "$S_TIME : Extracting: `event'"
 	cd "$data/raw"
 	local files ""
 	foreach j in clinical referral test immunisation {	
@@ -47,7 +48,7 @@ qui foreach file in `dtafiles' {
 	egen min_date = min(index_date), by(patid)
 	format %td min_date
 	keep patid index_count min_date
-	rename min_date index_date
+	rename min_date index_date 
 	duplicates drop *, force
 	save "$data/patlists/patlist_`event'.dta", replace
 }

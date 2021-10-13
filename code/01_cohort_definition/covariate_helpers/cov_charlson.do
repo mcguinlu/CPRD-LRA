@@ -1,6 +1,6 @@
 * Load patient list ------------------------------------------------------------
 
-use "$data/cohort2.dta", clear
+use "$data/results/cohort-clean.dta", clear
 keep patid index_date
 rename index_date date_cohort
 
@@ -12,7 +12,7 @@ local score2 = "hemiplegia renal_disease diabetes_with_complications cancer"
 local score3 = "mod_liver_disease"
 local score6 = "metastatic_tumour aids"
 	
-qui foreach file in `patfiles' {
+foreach file in `patfiles' {
 	
 	local index_name = subinstr(subinstr("`file'",".dta","",.),"patlist_ci_","",.)
 	

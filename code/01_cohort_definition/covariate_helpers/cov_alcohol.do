@@ -26,7 +26,7 @@ qui foreach add in `addfiles' {
 	
 	* Remove records after index date ------------------------------------------
 	
-	joinby patid using "$data/cohort2.dta"
+	joinby patid using "$data/results/cohort-clean.dta"
 	keep patid alcohol eventdate index_date
 	keep if eventdate<index_date
 	

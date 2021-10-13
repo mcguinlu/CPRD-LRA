@@ -27,7 +27,7 @@ qui foreach add in `addfiles' {
 	
 	* Remove BMI records after index date --------------------------------------
 	
-	joinby patid using "$data/cohort2.dta"
+	joinby patid using "$data/results/cohort-clean.dta"
 	keep patid yob bmi eventdate index_date
 	keep if eventdate<index_date
 	keep if year(eventdate)-yob>24
@@ -71,11 +71,11 @@ gen weight_date = .
 gen index_date = .
 save "$data/tmp/tmp_bmi_hw.dta", replace
 
-qui foreach add in `addfiles' {
+foreach add in `addfiles' {
 
 	* Extract height and weight records ----------------------------------------
 
-	use patid enttype adid data1 eventdate using "$path/data/additional/`add'" ,clear
+	use patid enttype adid data1 eventdate using "$data/additional/`add'" ,clear
 	keep if enttype==13 | enttype==14
 	destring data1, gen(data)
 	drop if missing(data1)
@@ -84,7 +84,7 @@ qui foreach add in `addfiles' {
 	
 	* Remove records after index date ------------------------------------------
 	
-	joinby patid using "$data/cohort2.dta"
+	joinby patid using "$data/results/cohort-clean.dta"
 	keep patid yob data weight height eventdate index_date enttype
 	keep if eventdate<index_date
 	keep if year(eventdate)-yob>24

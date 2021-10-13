@@ -15,10 +15,10 @@ local consfiles : dir "$path/data/raw" files "consultation_*.dta"
 qui foreach file in `consfiles' {
 
 	use "$path/data/raw/`file'", clear
-
+	noi di "$S_TIME : Adding `file'"
 	* Restrict to events within time frame -------------------------------------
 
-	merge m:1 patid using "$data/cohort2.dta", keep(master match) keepusing(patid data_start index_date)
+	merge m:1 patid using "$data/results/cohort-clean.dta", keep(master match) keepusing(patid data_start index_date)
 	drop if missing(index_date)
 	replace eventdate = sysdate if missing(eventdate) // saves removal of 21 patients
 	keep if eventdate>=data_start & eventdate<index_date
@@ -51,7 +51,7 @@ save "$data/covar/cons_rate.dta", replace
 
 * Calculate consultation rate --------------------------------------------------
 
-use "$data/cohort2.dta", clear
+use "$data/results/cohort-clean.dta", clear
 keep patid data_start index_date
 merge 1:1 patid using "$data/covar/cons_rate.dta", keep(master match)
 drop _merge

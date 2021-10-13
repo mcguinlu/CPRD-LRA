@@ -1,14 +1,18 @@
 // WHOLE SAMPLE
 
-use "$data/analysis2.dta", clear
+use "$data/results/analysis.dta", clear
 
-* Complete case analysis
-drop if cohort_full_covar==0
-drop if missing(index_baseline_tc)
+* Drop patients whose follow-up ends before their index date
+drop if diagnosis_dem_end < index_date
 
-replace first_drug = "No LRA" if missing(first_drug)
+* Drop patients whose follow-up ends before they get a drug
+replace first_drug = "No LRA" if !missing(first_drug) & first_drug_date <= diagnosis_dem_end
 
-keep patid index_date index_end $hc_cov drug5 ssa 
+keep patid index_date diagnosis_dem_end $hc_cov sas fup
+
+egen t1_fup = median(fup)
+
+egen t1_fup_sd = sd(fup)
 
 gen t1_exposed = _N
 
@@ -52,22 +56,34 @@ gen alcohol_ever = cond(alcohol==3,0,1)
 
 egen t1_alcohol = total(alcohol_ever)
 
-egen t1_drug5 = total(drug5)
+egen t1_chol = mean(baseline_tc_all)
 
-gen stopped = cond(ssa==1,1,0)
+egen t1_chol_sd = sd(baseline_tc_all)
+
+egen t1_ldl = mean(baseline_ldl_all)
+
+egen t1_ldl_sd = sd(baseline_ldl_all)
+
+egen t1_dm2 = total(dm_type2)
+
+egen t1_dm1 = total(dm_type1)
+
+egen t1_ckd = total(ckd)
+
+gen stopped = cond(sas==1,1,0)
 
 egen t1_stop = total(stopped)
 
-gen added = cond(ssa==2,1,0)
+gen added = cond(sas==2,1,0)
 
 egen t1_add = total(added)
 
-gen switched = cond(ssa==3,1,0)
+gen switched = cond(sas==3,1,0)
 
 egen t1_switch = total(switched)
 
 gen prior = 0
-replace prior = 1 if index_date>=index_end
+replace prior = 1 if index_date>=diagnosis_dem_end
 
 egen t1_prior = total(prior)
 
@@ -77,19 +93,27 @@ duplicates drop
 
 gen first_drug = "Whole Sample"
 
-save "$data/cohort2_table1_wholesample.dta", replace
+save "$data/results/table1.dta", replace
 
+********************************************************************************
 // BY INDEX DRUG
+********************************************************************************
 
-use "$data/analysis2.dta", clear
-
-* Complete case analysis
-drop if cohort_full_covar==0
-drop if missing(index_baseline_tc)
+use "$data/results/analysis.dta", clear
 
 replace first_drug = "No LRA" if missing(first_drug)
 
-keep patid index_date index_end first_drug $hc_cov drug5 ssa
+* Drop patients whose follow-up ends before their index date
+drop if diagnosis_dem_end <= index_date
+
+* Drop patients whose follow-up ends before they get a drug
+replace first_drug = "No LRA" if !missing(first_drug) & first_drug_date <= diagnosis_dem_end
+
+keep patid index_date diagnosis_dem_end first_drug $hc_cov drug5 sas dm_type1 ckd fup
+
+egen t1_fup = median(fup), by(first_drug)
+
+egen t1_fup_sd = sd(fup), by(first_drug)
 
 egen t1_exposed = count(first_drug), by(first_drug)
 
@@ -133,22 +157,34 @@ gen alcohol_ever = cond(alcohol==3,0,1)
 
 egen t1_alcohol = total(alcohol_ever), by(first_drug)
 
-egen t1_drug5 = total(drug5), by(first_drug)
+egen t1_chol = mean(baseline_tc_all), by(first_drug)
 
-gen stopped = cond(ssa==1,1,0)
+egen t1_chol_sd = sd(baseline_tc_all), by(first_drug)
+
+egen t1_ldl = mean(baseline_ldl_all), by(first_drug)
+
+egen t1_ldl_sd = sd(baseline_ldl_all), by(first_drug)
+
+egen t1_dm2 = total(dm_type2), by(first_drug)
+
+egen t1_dm1 = total(dm_type1), by(first_drug)
+
+egen t1_ckd = total(ckd), by(first_drug)
+
+gen stopped = cond(sas==1,1,0)
 
 egen t1_stop = total(stopped), by(first_drug)
 
-gen added = cond(ssa==2,1,0)
+gen added = cond(sas==2,1,0)
 
 egen t1_add = total(added), by(first_drug)
 
-gen switched = cond(ssa==3,1,0)
+gen switched = cond(sas==3,1,0)
 
 egen t1_switch = total(switched), by(first_drug)
 
 gen prior = 0
-replace prior = 1 if index_date>=index_end
+replace prior = 1 if index_date>=diagnosis_dem_end
 
 egen t1_prior = total(prior), by(first_drug)
 
@@ -156,7 +192,11 @@ keep first_drug t1*
 
 duplicates drop
 
-append using "$data/cohort2_table1_wholesample.dta", force
+append using "$data/results/table1.dta", force
+
+********************************************************************************
+// CLEAN & EXPORT
+********************************************************************************
 
 replace first_drug = "Statins" if first_drug=="hc_sta"
 replace first_drug = "Bile acid sequestrants" if first_drug=="hc_bas"
@@ -197,16 +237,26 @@ gen smoking =string(round(100*(t1_smoking/N),0.1),"%3.1f") + "% (" + string(t1_s
 
 gen bmi = string(round(t1_bmi,0.1),"%3.1f") + " (" + string(round(t1_bmi_sd,0.1),"%3.1f") + ")"
 
-gen drug5 = string(round(100*(t1_drug5/N),0.1),"%3.1f") + "% (" + string(t1_drug5,"%3.0f") + ")"
+gen chol = string(round(t1_chol,0.1),"%3.1f") + " (" + string(round(t1_chol_sd,0.1),"%3.1f") + ")"
+
+gen ldl = string(round(t1_ldl,0.1),"%3.1f") + " (" + string(round(t1_ldl_sd,0.1),"%3.1f") + ")"
+
+gen ckd = string(round(100*(t1_ckd/N),0.1),"%3.1f") + "% (" + string(t1_ckd,"%3.0f") + ")"
+
+gen dm1 = string(round(100*(t1_dm1/N),0.1),"%3.1f") + "% (" + string(t1_dm1,"%3.0f") + ")"
+
+gen dm2 = string(round(100*(t1_dm2/N),0.1),"%3.1f") + "% (" + string(t1_dm2,"%3.0f") + ")"
 
 gen stop = string(round(100*(t1_stop/N),0.1),"%3.1f") + "% (" + string(t1_stop,"%3.0f") + ")"
 gen add = string(round(100*(t1_add/N),0.1),"%3.1f") + "% (" + string(t1_add,"%3.0f") + ")"
 gen switch = string(round(100*(t1_switch/N),0.1),"%3.1f") + "% (" + string(t1_switch,"%3.0f") + ")"
 
+gen fup = string(round(t1_fup,0.1),"%3.1f")
+
 rename t1_prior prior
 
 drop t1_*
 
-order first_drug N year female age cad cbs cvd charlson imd cons_rate alcohol smoking bmi pad hyp stop add switch drug5 prior
+order first_drug N year female age cad cbs cvd charlson imd cons_rate alcohol smoking bmi pad hyp chol ckd dm1 stop add switch ldl dm2 fup
 
-outsheet using "$output/cohort2_table1.csv", comma replace
+outsheet using "$output/files/table1.csv", comma replace

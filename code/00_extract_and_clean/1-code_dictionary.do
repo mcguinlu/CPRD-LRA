@@ -1,14 +1,17 @@
+* COVARIATES
+
+* Define covariates to be retained in all files --------------------------------
+global hc_basic "patid pracid gender region dob yob frd crd uts tod lcd deathdate fup accept data_* index_* diagnosis* studytime drug5 drug10 drug_fup male pres_year_* dementia_within_6 sas first_drug* index_year* *_dummy" 
+
+global hc_cov "male index_age_start cad cbs cvd bmi charlson imd2010 cons_rate smoking alcohol pad hyp ckd baseline_tc_all baseline_ldl_all dm_type1 dm_type2"
+
+global analysis_cov "male i.index_year_group cad cbs cvd bmi charlson imd2010 cons_rate i.smoking i.alcohol pad hyp ckd baseline_tc_all baseline_ldl_all dm_type1 dm_type2"
+
 * EVENTS
 
-global ht_treat "ht_aab ht_ace ht_ace_ccb ht_ace_thi ht_anb ht_arb ht_arb_ccb ht_arb_ccb_thi ht_arb_thi ht_bab ht_bab_ccb ht_bab_ld ht_bab_ld_thi ht_bab_psd_thi ht_bab_thi ht_caa ht_ccb ht_ccb_thi ht_ld ht_ld_psd ht_psd ht_psd_thi ht_ren ht_thi ht_vad"
-
-global ht_proto "ht_bab ht_aab ht_ace ht_arb ht_caa ht_ccb ht_ld ht_psd ht_thi ht_vad"
-
-global ht_base "ht_bab"
-
-global ht_paper "ht_aab ht_arb ht_ace ht_bab ht_ccb ht_diu ht_vad"
-
 global hc_treat "hc_bas hc_eze hc_eze_sta hc_fib hc_nag hc_om3 hc_sta"
+
+global hc_treat_min "hc_sta hc_bas hc_fib"
 
 global hc_proto "hc_sta hc_fib hc_bas hc_om3 hc_eze hc_nag"
 
